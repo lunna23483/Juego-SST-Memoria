@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🎴 Memoria SST Pro</title>
 
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y5WC0FBFZZ"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-Y5WC0FBFZZ');
+</script>
+
 <style>
 body{
   font-family: Arial;
@@ -128,7 +137,6 @@ const questions = [
  {q:"¿Qué protege los ojos?", o:["Gafas","Botas","Chaleco"], r:0}
 ];
 
-// 🔥 CONTROL DE PREGUNTAS
 let questionsPool = [];
 
 function resetQuestions(){
@@ -148,6 +156,7 @@ function shuffle(array){
 }
 
 function createBoard(){
+  gtag('event', 'inicio_juego');
   grid.innerHTML="";
   shuffle(icons).forEach(icon=>{
     const card = document.createElement("div");
@@ -170,6 +179,8 @@ function flip(card,icon){
 
   card.classList.add("flip");
 
+  gtag('event', 'flip_carta');
+
   if(!first){
     first={card,icon};
     return;
@@ -179,7 +190,7 @@ function flip(card,icon){
   lock=true;
 
   if(first.icon === second.icon){
-    score += 0; // puntos por pareja
+    score += 0;
     matches++;
     updateScore();
     setTimeout(showQuestion,500);
@@ -204,6 +215,7 @@ function updateScore(){
 }
 
 function restartGame(){
+  gtag('event', 'reinicio_juego');
   score = 0;
   matches = 0;
   updateScore();
@@ -212,7 +224,6 @@ function restartGame(){
   createBoard();
 }
 
-// 🔥 PREGUNTA CON CASTIGO
 function showQuestion(){
   const q = getQuestion();
   answered = false;
@@ -233,11 +244,15 @@ function showQuestion(){
       if(answered) return;
       answered = true;
 
+      gtag('event', 'respuesta');
+
       if(i === q.r){
         score += 10;
+        gtag('event', 'respuesta_correcta');
         alert("✅ ¡Correcto! +10 puntos");
       } else {
         score -= 10;
+        gtag('event', 'respuesta_incorrecta');
         alert("❌ Incorrecto -10 puntos");
       }
 
@@ -255,6 +270,7 @@ function showQuestion(){
 
 function checkEnd(){
   if(matches === icons.length/2){
+    gtag('event', 'juego_completado', { value: score });
     setTimeout(()=>{
       alert("🏆 ¡Ganaste! Puntos: "+score);
     },80);
